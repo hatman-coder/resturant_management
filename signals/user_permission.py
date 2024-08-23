@@ -16,33 +16,19 @@ def post_save_user_handler(sender, instance, created, **kwargs):
 
     # Handle Owner Permissions
     if instance.role == RoleEnum.OWNER.value:
-        for module_name, permissions in owner_permissions.items():
-            module, _ = Module.objects.get_or_create(name=module_name.capitalize())
-            for permission_name in permissions:
-                permission, _ = Permission.objects.get_or_create(
-                    name=permission_name, module=module
-                )
-                permission_ids.append(permission.id)
-
-    # Handle User Permissions
+        permission_data = owner_permissions.items()
     elif instance.role == RoleEnum.USER.value:
-        for module_name, permissions in user_permissions.items():
-            module, _ = Module.objects.get_or_create(name=module_name.capitalize())
-            for permission_name in permissions:
-                permission, _ = Permission.objects.get_or_create(
-                    name=permission_name, module=module
-                )
-                permission_ids.append(permission.id)
-
-    # Handle Employee Permissions
+        permission_data = user_permissions.items()
     elif instance.role == RoleEnum.EMPLOYEE.value:
-        for module_name, permissions in employee_permissions.items():
-            module, _ = Module.objects.get_or_create(name=module_name.capitalize())
-            for permission_name in permissions:
-                permission, _ = Permission.objects.get_or_create(
-                    name=permission_name, module=module
-                )
-                permission_ids.append(permission.id)
+        permission_data = employee_permissions.items()
+
+    for module_name, permissions in permission_data:
+        module, _ = Module.objects.get_or_create(name=module_name.capitalize())
+        for permission_name in permissions:
+            permission, _ = Permission.objects.get_or_create(
+                name=permission_name, module=module
+            )
+            permission_ids.append(permission.id)
 
     # Assign Permissions to Role and Create UserRole
     role, _ = Role.objects.get_or_create(name=instance.role)
