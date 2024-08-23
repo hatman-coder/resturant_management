@@ -9,15 +9,21 @@ class Restaurant(BaseModel):
     )
     name = models.CharField(max_length=252)
 
+    def __str__(self):
+        return f"{self.name} ({self.owner.username})"
 
-# class Employee(BaseModel):
-#     user = models.ForeignKey(
-#         User, on_delete=models.CASCADE, related_name="restaurant_employee"
-#     )
-#     restuarant = models.ForeignKey(
-#         Restaurant, on_delete=models.CASCADE, related_name="employee_restaurant"
-#     )
-#     salary = models.PositiveIntegerField(blank=True, null=True)
+
+class Employee(BaseModel):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="restaurant_employee"
+    )
+    restaurant = models.ForeignKey(
+        Restaurant, on_delete=models.CASCADE, related_name="employee_restaurant"
+    )
+    salary = models.PositiveIntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username} ({self.restaurant.name})"
 
 
 class Menu(BaseModel):
