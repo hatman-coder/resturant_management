@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 
 from external.pagination import CustomPagination
+from external.swagger_query_params import set_query_params
 from ..serializers.serializers_v1 import OrderSerializer
 from ..models import Orders
 from apps.restaurant.models import MenuItem, Employee, Restaurant
@@ -43,9 +44,12 @@ class OrderViewSet(ModelViewSet):
             return Response(response_data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+    @extend_schema(parameters=set_query_params('list', [
+        {"name": 'traking_id', 'type': 'string'},
+    ]))
     def trak_order(self, request, *args, **kwargs):
-        order = Orders.objects.filter(traking_id=request.data['traking_id']).first()
+        traking_id = request.query_params.get('traking_id')
+        order = Orders.objects.filter(traking_id=traking_id).first()
         if order:
             response_data ={
                 "item_name": order.item.name,
@@ -104,8 +108,21 @@ class OrderViewSet(ModelViewSet):
         return Response({"message": "You do not have permission to access this order"}, status=status.HTTP_403_FORBIDDEN)
 
     
-    # def update(self, request, *args, **kwargs):
-    #     
+    def order_status_update(self, request, *args, **kwargs):
+        restaurant_id = kwargs['restaurant_id']
+        restaurant = Restaurant.objects.filter(id=restaurant_id).first()
+        is_empoly = Employee.objects.filter(user=request.user, restaurant=restaurant).first()
+        if is_empoly:
+            queryset = self.get_queryset()
+            serializer_class = self.get_serializer_class()
+            queryset = queryset.filter(id=kwargs['order_id'], restaurant=restaurant).first()
+            order_status = request.data['order_status']
+            serializer = serializer_class(queryset, data=order_status, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response({"message": "Accepted"}, status=status.HTTP_202_ACCEPTED)
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "You do not have permission to access this order"}, status=status.HTTP_403_FORBIDDEN)
         
     
         
