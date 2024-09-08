@@ -61,11 +61,9 @@ class UserViewSet(
 
     # @has_permission("create_user")
     def post(self, request, *args, **kwargs):
-        if request.data["role"] not in ['owner', 'user']:
+        if request.data["role"] not in ["owner", "user"]:
             return Response(
-                {
-                    "error": "Only (user or owner) registration is acceptable"
-                },
+                {"error": "Only (user or owner) registration is acceptable"},
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -80,7 +78,9 @@ class UserViewSet(
                 )
 
         if "profile_pic" in request.data.keys():
-            if request.data["profile_pic"] in ["", None, "null"] or isinstance(request.data['profile_pic'], type('')):
+            if request.data["profile_pic"] in ["", None, "null"] or isinstance(
+                request.data["profile_pic"], type("")
+            ):
                 request.data.pop("profile_pic")
 
         serializer_class = self.get_serializer_class()
@@ -92,7 +92,8 @@ class UserViewSet(
             )
         else:
             return Response(
-                {"error", error_wrapper(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST
+                {"error": error_wrapper(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
     @has_permission("update_user")
@@ -115,7 +116,9 @@ class UserViewSet(
             )
 
         if "profile_pic" in request.data.keys():
-            if request.data["profile_pic"] in ["", None, "null"] or isinstance(request.data['profile_pic'], type('')):
+            if request.data["profile_pic"] in ["", None, "null"] or isinstance(
+                request.data["profile_pic"], type("")
+            ):
                 request.data.pop("profile_pic")
 
         serializer_class = self.get_serializer_class()
@@ -127,7 +130,8 @@ class UserViewSet(
             )
         else:
             return Response(
-                {"error": error_wrapper(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST
+                {"error": error_wrapper(serializer.errors)},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
     @has_permission("view_user")
