@@ -50,7 +50,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
-CUSTOM_APPS = ["apps.user", "apps.permission", "apps.restaurant"]
+CUSTOM_APPS = ["apps.user", "apps.permission", "apps.restaurant", "apps.order"]
 
 INSTALLED_LIBRARIES = [
     "rest_framework",
